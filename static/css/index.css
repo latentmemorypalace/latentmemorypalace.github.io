@@ -1,0 +1,323 @@
+body {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+
+.footer .icon-link {
+    font-size: 25px;
+    color: #000;
+}
+
+.link-block a {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.dnerf {
+  font-variant: small-caps;
+}
+
+
+.teaser .hero-body {
+  padding-top: 0;
+  padding-bottom: 3rem;
+}
+
+.teaser {
+  font-family: 'Google Sans', sans-serif;
+}
+
+
+.publication-title {
+}
+
+.publication-banner {
+  max-height: parent;
+
+}
+
+.publication-banner video {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  object-fit: fit;
+}
+
+.publication-header .hero-body {
+}
+
+.publication-title {
+    font-family: 'Google Sans', sans-serif;
+}
+
+.publication-authors {
+    font-family: 'Google Sans', sans-serif;
+}
+
+.publication-venue {
+    color: #555;
+    width: fit-content;
+    font-weight: bold;
+}
+
+.publication-awards {
+    color: #ff3860;
+    width: fit-content;
+    font-weight: bolder;
+}
+
+.publication-authors {
+}
+
+.publication-authors a {
+   color: hsl(204, 86%, 53%) !important;
+}
+
+.publication-authors a:hover {
+    text-decoration: underline;
+}
+
+.author-block {
+  display: inline-block;
+}
+
+.publication-banner img {
+}
+
+.publication-authors {
+  /*color: #4286f4;*/
+}
+
+.publication-video {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+
+    overflow: hidden;
+    border-radius: 10px !important;
+}
+
+.publication-video iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.publication-body img {
+}
+
+.results-carousel {
+  overflow: hidden;
+}
+
+.results-carousel .item {
+  margin: 5px;
+  overflow: hidden;
+  border: 1px solid #bbb;
+  border-radius: 10px;
+  padding: 0;
+  font-size: 0;
+}
+
+.results-carousel video {
+  margin: 0;
+}
+
+
+.interpolation-panel {
+  background: #f5f5f5;
+  border-radius: 10px;
+}
+
+.interpolation-panel .interpolation-image {
+  width: 100%;
+  border-radius: 5px;
+}
+
+.interpolation-video-column {
+}
+
+.interpolation-panel .slider {
+  margin: 0 !important;
+}
+
+.interpolation-panel .slider {
+  margin: 0 !important;
+}
+
+#interpolation-image-wrapper {
+  width: 100%;
+}
+#interpolation-image-wrapper img {
+  border-radius: 5px;
+}
+
+img.inline-figure-six {
+  display: block; 
+  margin-left: auto;
+  margin-right: auto; 
+  width: 60%;
+}
+
+img.inline-figure-four-thirds {
+  display: block; 
+  margin-left: auto;
+  margin-right: auto; 
+  width: 75%;
+}
+
+img.inline-figure {
+  display: block; 
+  margin-left: auto;
+  margin-right: auto; 
+  width: 100%;
+}
+
+.hr {
+  display: block;
+  margin-left: auto;
+  margin-right: auto; 
+  width: 75%;
+  height: 1px;
+  /* margin: 48px 0; */
+  background-color: #d6dbdf;
+}
+
+.multi-color-text {
+  background: linear-gradient(to right, #4285f4, #6a4fb4, #ac3f87);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom Button Styling */
+.custom-btn-gradient {
+  background: linear-gradient(to right, #4285f4, #6a4fb4, #ac3f87);
+  color: white;
+  border: none;
+  padding: 0.5em 1em; /* Reduce padding */
+  margin: 0.3em; /* Reduce margin for compact layout */
+  border-radius: 4px; /* Slightly smaller border-radius */
+  font-family: "Poppins", sans-serif;
+  font-size: 0.9em; /* Reduce font size */
+  font-weight: 550;
+  letter-spacing: 0.3px; /* Reduce spacing */
+  text-transform: uppercase;
+  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease-in-out;
+  min-width: 120px; /* Ensures a consistent button width */
+}
+
+/* Hover & Focus Effect */
+.custom-btn-gradient:hover,
+.custom-btn-gradient:focus {
+  filter: brightness(1.1);
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+/* Optional: Add a subtle text shadow for a more polished look */
+.custom-btn-gradient span {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Segmented toggle (DROID task switcher): one rounded strip with a sliding pill that
+   highlights the active task. The thumb width is 1/N of the strip; JS slides it by index. */
+.seg-toggle {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 4px;
+  background: #ECE7F3;
+  border-radius: 999px;
+  box-shadow: inset 0 1px 3px rgba(60, 40, 100, 0.12);
+}
+.seg-toggle .seg-thumb {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc((100% - 8px) / 4);
+  border-radius: 999px;
+  background: linear-gradient(to right, #4285f4, #6a4fb4, #ac3f87);
+  box-shadow: 0 2px 8px rgba(106, 79, 180, 0.35);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+.seg-toggle .seg-btn {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0%;            /* 0% (not unitless 0) for Safari flexbox */
+  min-width: 0;
+  -webkit-appearance: none; /* Safari renders <button> with native chrome otherwise */
+  appearance: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0.5em 0.5em;
+  border-radius: 999px;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 550;
+  letter-spacing: 0.2px;
+  color: #6b6580;
+  white-space: nowrap;
+  transition: color 0.28s ease;
+}
+.seg-toggle .seg-btn.is-active { color: #fff; }
+.seg-toggle .seg-btn:hover { color: #2E1F7A; }
+.seg-toggle .seg-btn.is-active:hover { color: #fff; }
+@media screen and (max-width: 560px) {
+  .seg-toggle .seg-btn { font-size: 0.66rem; letter-spacing: 0; padding: 0.5em 0.2em; }
+}
+
+/* Reasoning-trace carousel skeleton (markup is built by initReasoningCarousels) */
+.rt-carousel { margin: 1.25rem auto 0; }
+.rt-row { display: flex; align-items: center; gap: 12px; }
+.rt-prev, .rt-next {
+  flex: none; background: none; border: 1px solid #ccc; border-radius: 50%;
+  width: 36px; height: 36px; cursor: pointer; font-size: 1.1rem; line-height: 1;
+}
+.rt-viewport { flex: 1; overflow: hidden; }
+.rt-track { display: flex; }
+.rt-indicator { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+
+.video-hover {
+  width: 100%;
+  border-radius: 6px;
+}
+
+.team-photo {
+  width: 128px !important;
+  height: 128px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+.team-photo {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  object-fit: cover;
+  /* crops to the center */
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+  /* minor top spacing for the name */
+}
+/* Bulma's html reset sets -webkit-font-smoothing: antialiased, which renders glyphs
+   thinner on macOS. The method-figure iframes (Figs 2/3) have no Bulma and use default
+   subpixel smoothing (heavier stems); opt the inline variance-schedule viz out so its
+   serif labels match the figures' weight. */
+#adaptive-viz {
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
+}

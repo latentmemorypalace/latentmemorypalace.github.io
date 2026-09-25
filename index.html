@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+    content="Latent Memory Palace: Reasoning for Control as Autoregressive Variational Inference">
+  <meta name="keywords" content="Imitation Learning, Robotics, Reasoning, Variational Inference">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Latent Memory Palace: Reasoning for Control as Autoregressive Variational Inference</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <!-- MathJax for native LaTeX rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        macros: {
+          coloneqq: '\\mathrel{:=}',
+          eos: '\\texttt{eos}'
+        }
+      },
+      svg: {fontCache: 'global'}
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+</head>
+
+<body>
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">
+              <span class="multi-color-text">Latent Memory Palace</span>: Reasoning for Control as Autoregressive
+              Variational Inference
+            </h1>
+          </div>
+        </div>
+      </div>
+
+      <!-- Teaser: HTML-native frame player with carousel -->
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-full">
+            <div id="teaser-player" style="margin: 0 auto; user-select: none;">
+              <div style="display: flex; gap: 12px; align-items: flex-start; width: 70%; margin: 0 auto;">
+                <!-- Scene camera -->
+                <div style="flex: 1; min-width: 0;">
+                  <div
+                    style="font-size: 0.75rem; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+                    Scene Camera</div>
+                  <div
+                    style="position: relative; width: 100%; padding-bottom: 100%; background: transparent; border-radius: 8px; overflow: hidden;">
+                    <video id="teaser-scene" src="./static/teaser/episode_1/scene.mp4" muted playsinline loop
+                      preload="auto"
+                      style="position: absolute; top: -1px; left: -1px; width: calc(100% + 2px); height: calc(100% + 2px); object-fit: cover; display: block;"></video>
+                  </div>
+                </div>
+                <!-- Wrist camera -->
+                <div style="flex: 1; min-width: 0;">
+                  <div
+                    style="font-size: 0.75rem; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+                    Wrist Camera</div>
+                  <div
+                    style="position: relative; width: 100%; padding-bottom: 100%; background: transparent; border-radius: 8px; overflow: hidden;">
+                    <video id="teaser-wrist" src="./static/teaser/episode_1/wrist.mp4" muted playsinline loop
+                      preload="auto"
+                      style="position: absolute; top: -1px; left: -1px; width: calc(100% + 2px); height: calc(100% + 2px); object-fit: cover; display: block;"></video>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Reasoning steps indicator -->
+              <div style="margin-top: 16px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                  <div
+                    style="font-size: 0.75rem; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Reasoning Steps</div>
+                  <div id="teaser-step-label"
+                    style="font-size: 0.75rem; color: #888; font-family: 'Google Sans', monospace;"></div>
+                </div>
+                <div id="teaser-steps" style="display: flex; gap: 3px; height: 96px; align-items: flex-end;"></div>
+
+                <!-- Thin-line scrubber: a hairline track under the trace, with the ‹ › knob riding it -->
+                <div id="teaser-scrub"
+                  style="position: relative; touch-action: none; cursor: ew-resize; padding: 20px 0 12px;">
+                  <div style="height: 2px; background: #e9e6f2; border-radius: 1px;"></div>
+                  <div id="teaser-progress"
+                    style="position: absolute; top: 21px; left: 0; width: 100%; height: 2px; background: #b3a8d4; border-radius: 1px; transform: scaleX(0); transform-origin: left center;">
+                  </div>
+                  <div id="teaser-playhead"
+                    style="position: absolute; top: 21px; left: 0; width: 0; height: 0; pointer-events: none;">
+                    <div
+                      style="position: absolute; top: 0; left: 0; transform: translate(-50%, -50%); width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 6px rgba(0,0,0,0.28); user-select: none;">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style="position: relative; display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+                <button id="teaser-playbtn"
+                  style="background: none; border: 1px solid #ccc; border-radius: 4px; padding: 4px 12px; cursor: pointer; font-size: 0.8rem;">Pause</button>
+                <!-- Task instruction, centered in the controls row -->
+                <div id="teaser-task-text"
+                  style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: #444; font-family: 'Google Sans', sans-serif; pointer-events: none;">
+                </div>
+              </div>
+
+              <!-- Carousel navigation -->
+              <div style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 12px;">
+                <button id="teaser-prev"
+                  style="background: none; border: 1px solid #ccc; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 1rem; line-height: 1;">&#8592;</button>
+                <div id="teaser-dots" style="display: flex; gap: 8px;"></div>
+                <button id="teaser-next"
+                  style="background: none; border: 1px solid #ccc; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 1rem; line-height: 1;">&#8594;</button>
+              </div>
+            </div>
+
+            <script>
+              (function () {
+                try {
+                  const EPISODES = [
+                    {path: 'episode_1', totalFrames: 279, instruction: 'Put objects into bowl', stepLens: [14.9375, 14.96875, 9.65625, 15.40625, 5.328125, 15.515625, 15.484375, 15.03125, 9.296875, 15.4375, 4.078125, 14.9375, 15.6875, 14.25, 10.046875, 15.375, 5.84375, 15.390625]},
+                    {path: 'episode_2', totalFrames: 205, instruction: 'Put objects into bowl', stepLens: [15.46875, 15.515625, 15.375, 6.671875, 11.265625, 14.515625, 4.28125, 15.0, 15.140625, 6.59375, 15.53125, 5.375, 14.640625]},
+                    {path: 'episode_3', totalFrames: 273, instruction: 'Insert peg into hole', stepLens: [15.21875, 15.40625, 14.921875, 6.25, 12.078125, 15.59375, 15.59375, 15.28125, 15.703125, 15.59375, 15.625, 15.515625, 14.96875, 14.875, 15.453125, 3.625, 4.578125, 15.40625]},
+                    {path: 'episode_4', totalFrames: 136, instruction: 'Pick up the block and put it in the bowl', stepLens: [12.84375, 13.203125, 13.234375, 8.59375, 12.8125, 13.71875, 12.578125, 6.21875, 12.1875]},
+                    {path: 'episode_5', totalFrames: 161, instruction: 'Pick up the marker and put it in the mug', stepLens: [12.875, 13.390625, 14.46875, 8.21875, 13.671875, 12.734375, 13.578125, 9.453125, 8.078125, 13.296875, 14.421875]},
+                  ];
+                  const ACTION_CHUNK = 16;
+
+                  let currentEp = 0;
+                  let frame = 0;
+                  let playing = true;
+                  let animId = null;
+                  let dragResume = false;
+                  let seekTarget = null;   // pending seek frame; pins the UI until 'seeked' fires
+                  let mtNext = 0;          // wall-clock time of the next metronome tick
+                  let onReadyRef = null;   // pending 'loadeddata' handler (replaced on episode switch)
+                  const FPS = 15, SLOT = 1000 / FPS;
+
+                  const scene = document.getElementById('teaser-scene');
+                  const wrist = document.getElementById('teaser-wrist');
+                  const scrub = document.getElementById('teaser-scrub');
+                  const playhead = document.getElementById('teaser-playhead');
+                  const progress = document.getElementById('teaser-progress');
+                  const stepsContainer = document.getElementById('teaser-steps');
+                  const stepLabel = document.getElementById('teaser-step-label');
+                  const playBtn = document.getElementById('teaser-playbtn');
+                  const prevBtn = document.getElementById('teaser-prev');
+                  const nextBtn = document.getElementById('teaser-next');
+                  const dotsContainer = document.getElementById('teaser-dots');
+                  const taskText = document.getElementById('teaser-task-text');
+
+                  // Build dots
+                  EPISODES.forEach((_, i) => {
+                    const dot = document.createElement('div');
+                    dot.style.cssText = 'width: 8px; height: 8px; border-radius: 50%; background: #ccc; cursor: pointer; transition: background 0.2s;';
+                    dot.addEventListener('click', () => switchEpisode(i));
+                    dotsContainer.appendChild(dot);
+                  });
+
+                  function buildBars() {
+                    const ep = EPISODES[currentEp];
+                    const maxLen = Math.max(...ep.stepLens);
+                    stepsContainer.innerHTML = '';
+                    ep.stepLens.forEach(len => {
+                      const bar = document.createElement('div');
+                      const h = (len / maxLen) * 100;
+                      bar.style.cssText = `flex:1; height:${h}%; background: linear-gradient(to top, #4285f4, #6a4fb4); border-radius: 2px; opacity: 0.3; transition: opacity 0.15s, transform 0.15s; transform-origin: center bottom;`;
+                      stepsContainer.appendChild(bar);
+                    });
+                    lastStepIdx = -1;   // repaint on next setBarsUI
+                  }
+
+                  function updateDots() {
+                    Array.from(dotsContainer.children).forEach((dot, i) => {
+                      dot.style.background = i === currentEp ? '#6a4fb4' : '#ccc';
+                    });
+                  }
+
+                  // Bars + token label for frame f; DOM writes only on step change (no-op writes still cost layout).
+                  let lastStepIdx = -1;
+                  function setBarsUI(f) {
+                    const ep = EPISODES[currentEp];
+                    frame = f;
+                    const stepIdx = Math.min(Math.floor(f / ACTION_CHUNK), ep.stepLens.length - 1);
+                    if (stepIdx === lastStepIdx) return;
+                    lastStepIdx = stepIdx;
+                    const bars = stepsContainer.children;
+                    for (let i = 0; i < bars.length; i++) {
+                      bars[i].style.opacity = i === stepIdx ? '1' : '0.3';
+                      bars[i].style.transform = i === stepIdx ? 'scaleY(1.1)' : 'scaleY(1)';
+                    }
+                    stepLabel.textContent = `${ep.stepLens[stepIdx].toFixed(1)} reasoning tokens`;
+                  }
+                  // Playhead via compositor transforms (translateX/scaleX): no layout work, sub-pixel smooth.
+                  let trackW = 0;
+                  function measureTrack() {trackW = scrub.clientWidth;}
+                  window.addEventListener('resize', measureTrack);
+                  let lastPx = -1;
+                  function setPlayhead(pos) {
+                    const ep = EPISODES[currentEp];
+                    if (!trackW) measureTrack();
+                    const frac = ep.totalFrames > 1 ? pos / (ep.totalFrames - 1) : 0;
+                    const px = frac * trackW;
+                    if (Math.abs(px - lastPx) < 0.02) return;   // nothing visible changed
+                    lastPx = px;
+                    playhead.style.transform = 'translateX(' + px.toFixed(2) + 'px)';
+                    progress.style.transform = 'scaleX(' + frac.toFixed(5) + ')';
+                  }
+                  function setFrameUI(f) {
+                    setPlayhead(f);
+                    setBarsUI(f);
+                  }
+
+                  // Seek both videos (all-intra = frame-accurate); UI stays pinned until a commit lands AT the target.
+                  let seekRetries = 0;
+                  function seekTo(f) {
+                    const t = f / FPS;
+                    seekTarget = f;
+                    seekRetries = 0;
+                    mtNext = 0;
+                    scene.currentTime = t;
+                    wrist.currentTime = t;
+                    setFrameUI(f);
+                  }
+                  scene.addEventListener('seeked', () => {
+                    if (seekTarget === null) return;
+                    if (Math.abs(scene.currentTime * FPS - seekTarget) <= 1.5) {seekTarget = null; return;}
+                    if (scene.seeking) return;   // superseded drag seek committed; the real one is still in flight
+                    if (seekRetries < 3) {
+                      seekRetries++;
+                      scene.currentTime = seekTarget / FPS;
+                      wrist.currentTime = seekTarget / FPS;
+                    } else {
+                      console.warn('Teaser: seek landed at ' + scene.currentTime.toFixed(2) + 's instead of ' +
+                        (seekTarget / FPS).toFixed(2) + 's — if local, serve with HTTP Range support (python3 serve.py).');
+                      seekTarget = null;
+                    }
+                  });
+
+                  function switchEpisode(idx) {
+                    currentEp = idx;
+                    frame = 0;
+                    seekTarget = null;
+                    measureTrack();
+                    const ep = EPISODES[currentEp];
+                    taskText.textContent = ep.instruction;
+                    buildBars();
+                    updateDots();
+                    setFrameUI(0);
+                    // 'loadeddata' may arrive after the user has scrubbed (cold load) — don't clobber;
+                    // drop any handler still pending from a previous episode.
+                    if (onReadyRef) scene.removeEventListener('loadeddata', onReadyRef);
+                    onReadyRef = () => {
+                      onReadyRef = null;
+                      if (seekTarget === null && frame === 0) {scene.currentTime = 0; wrist.currentTime = 0;}
+                      if (playing) startPlay();
+                    };
+                    scene.addEventListener('loadeddata', onReadyRef, {once: true});
+                    scene.src = `./static/teaser/${ep.path}/scene.mp4`;
+                    wrist.src = `./static/teaser/${ep.path}/wrist.mp4`;
+                    scene.load(); wrist.load();
+                  }
+
+                  // rAF loop: pinned while seeking; otherwise wrist sync + metronome playhead.
+                  function tick() {
+                    if (!playing || suspended) {animId = null; return;}
+                    const ep = EPISODES[currentEp];
+                    if (seekTarget !== null) {
+                      setFrameUI(seekTarget);
+                    } else {
+                      // Sync wrist via playbackRate nudge (hard seeks flush the decoder = hitches).
+                      const drift = wrist.currentTime - scene.currentTime;
+                      if (Math.abs(drift) > 0.5) {wrist.currentTime = scene.currentTime; wrist.playbackRate = 1;}
+                      else {
+                        const rate = Math.max(0.9, Math.min(1.1, 1 - drift * 0.5));
+                        if (Math.abs(wrist.playbackRate - rate) > 0.004) wrist.playbackRate = rate;
+                      }
+                      // Metronome playhead: one whole-frame step per wall-clock slot, forward-only —
+                      // raw currentTime reads arrive in bursts and read as bouncing.
+                      const now = performance.now();
+                      if (!mtNext) mtNext = now;
+                      if (now >= mtNext) {
+                        const target = Math.min(scene.currentTime * FPS, ep.totalFrames - 1);
+                        const lag = target - frame;
+                        let f = frame;
+                        if (Math.abs(lag) > 8) {f = Math.round(target); mtNext = now + SLOT;}  // loop wrap / stall
+                        else if (lag >= 1) {f = frame + 1; mtNext += SLOT;}                    // normal tick
+                        else mtNext += SLOT / 2;                                                 // ahead: brief hold
+                        if (target - f > 2) mtNext = Math.min(mtNext, now + SLOT / 2);           // gentle catch-up
+                        if (mtNext < now - 200) mtNext = now;                                    // shed jank debt
+                        setFrameUI(f);
+                      }
+                    }
+                    animId = requestAnimationFrame(tick);
+                  }
+
+                  function startPlay() {
+                    playing = true;
+                    playBtn.textContent = 'Pause';
+                    scene.play().catch(() => { }); wrist.play().catch(() => { });
+                    if (!animId) animId = requestAnimationFrame(tick);
+                  }
+                  function stopPlay() {
+                    playing = false;
+                    playBtn.textContent = 'Play';
+                    scene.pause(); wrist.pause();
+                    if (animId) {cancelAnimationFrame(animId); animId = null;}
+                  }
+
+                  // Suspend decode + rAF while off-screen or tab-hidden; `playing` keeps user intent.
+                  let suspended = false, outOfView = false, tabHidden = false;
+                  function updateSuspend() {
+                    const v = outOfView || tabHidden;
+                    if (v === suspended) return;
+                    suspended = v;
+                    if (v) {scene.pause(); wrist.pause();}
+                    else if (playing) {
+                      scene.play().catch(() => { }); wrist.play().catch(() => { });
+                      if (!animId) animId = requestAnimationFrame(tick);
+                    }
+                  }
+                  if ('IntersectionObserver' in window) {
+                    new IntersectionObserver(es => {
+                      outOfView = !es[es.length - 1].isIntersecting;
+                      updateSuspend();
+                    }, {threshold: 0}).observe(document.getElementById('teaser-player'));
+                  }
+                  document.addEventListener('visibilitychange', () => {tabHidden = document.hidden; updateSuspend();});
+
+                  // Drag anywhere on the scrub row; videos pause during the drag, resume on release.
+                  function frameFromEvent(e) {
+                    const r = scrub.getBoundingClientRect();
+                    const t = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+                    return Math.round(t * (EPISODES[currentEp].totalFrames - 1));
+                  }
+                  const scrubMove = e => {e.preventDefault(); seekTo(frameFromEvent(e));};
+                  const scrubUp = () => {
+                    if (dragResume) {dragResume = false; scene.play().catch(() => { }); wrist.play().catch(() => { });}
+                    window.removeEventListener('pointermove', scrubMove);
+                    window.removeEventListener('pointerup', scrubUp);
+                    window.removeEventListener('pointercancel', scrubUp);
+                  };
+                  scrub.addEventListener('pointerdown', e => {
+                    e.preventDefault();
+                    if (playing) {dragResume = true; scene.pause(); wrist.pause();}
+                    seekTo(frameFromEvent(e));
+                    window.addEventListener('pointermove', scrubMove);
+                    window.addEventListener('pointerup', scrubUp);
+                    window.addEventListener('pointercancel', scrubUp);
+                  });
+                  playBtn.addEventListener('click', () => {playing ? stopPlay() : startPlay();});
+                  prevBtn.addEventListener('click', () => switchEpisode((currentEp - 1 + EPISODES.length) % EPISODES.length));
+                  nextBtn.addEventListener('click', () => switchEpisode((currentEp + 1) % EPISODES.length));
+
+                  switchEpisode(0);
+                } catch (e) {console.error('Teaser error:', e);}
+              })();
+            </script>
+
+            <div class="content has-text-justified" style="margin-top: 1.5rem;">
+              <span class="multi-color-text">Latent Memory Palace</span> (LMP) casts reasoning as variational
+              inference with an autoregressive latent distribution. From this principle, we build (1) performant control
+              policies that can adaptively allocate their test-time compute, and (2) discrete action tokenizers amenable
+              to training autoregressive policies.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>
+  </section>
+
+  <div class="hr"></div>
+
+  <!-- Method -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Method</h2>
+
+      <div class="columns is-centered">
+        <div class="column">
+          <h3 class="title is-5 has-text-left">Reasoning as Variational Inference</h3>
+          <div class="content has-text-justified">
+            <p>
+              We cast reasoning for control as inference in a latent-variable model, where actions \(a\) are
+              generated from observations \(o\) and latent traces \(z = (z_1, z_2, \ldots, z_{T(z)})\) drawn from a
+              vocabulary \(\mathcal{V} \cup \{\texttt{eos}\}\). We maximize the evidence lower bound of the maximum
+              likelihood objective:
+            </p>
+            <p style="overflow-x: auto;">
+              \[
+              \log p(a \mid o) \;\ge\;
+              \mathbb{E}_{z_{1:T(z)} \sim q_\theta(\cdot \mid o, a)}
+              \big[\, \log p_\phi(a \mid o, z_{1:T(z)}) \,\big]
+              - D_{\mathrm{KL}}\!\big(\, q_\theta(z_{1:T(z)} \mid o, a) \,\big\|\, p_\theta(z_{1:T(z)} \mid o) \,\big).
+              \]
+            </p>
+            <p>
+              The learned prior \(p_\theta(z \mid o)\) and the action decoder \(p_\phi(a \mid o, z)\) together
+              fully parameterize a policy: actions are generated by first sampling a reasoning trace \(z \sim p_\theta(z
+              \mid o)\), then sampling \(a \sim p_\phi(a \mid o, z)\).
+            </p>
+          </div>
+
+          <h3 class="title is-5 has-text-left">Adaptive Computation via Compression</h3>
+          <div class="content has-text-justified">
+            <p>
+              The objective above doesn't inherently incentivize adaptive computation. We introduce
+              compression by decaying the Gaussian action decoder's variance with latent length. This imposes a length
+              penalty and encourages the model to allocate latent steps parsimoniously.
+            </p>
+            <!-- Combined interactive: latent trellis + variance schedule + Gaussian coverage of the data -->
+            <div style="max-width: 860px; margin: 1.25rem auto 0;">
+              <svg id="adaptive-viz" viewBox="0 0 880 400"
+                style="width:100%; touch-action:none; user-select:none; display:block;"></svg>
+            </div>
+          </div>
+
+          <h3 class="title is-5 has-text-left">Training via Latent Space Reinforcement Learning</h3>
+          <div class="content has-text-justified">
+            <p>
+              We optimize the ELBO using latent-space reinforcement learning. Training alternates between two
+              phases: (1) the posterior generates a buffer of latent trajectories; (2) the model optimizes a clipped
+              surrogate objective (PPO) of the evidence lower bound, minimizing KL divergence to the posterior while
+              maximizing action likelihood.
+            </p>
+            <p class="has-text-centered">
+              <iframe class="lmp-figframe" src="./fig_training_embed.html" title="Training LMP-&pi;" scrolling="no"
+                loading="lazy"
+                style="width:100%;max-width:901px;aspect-ratio:901/414;border:0;display:block;margin:0 auto;"></iframe>
+            </p>
+          </div>
+
+          <h3 class="title is-5 has-text-left">Practical Instantiation</h3>
+          <div class="content has-text-justified">
+            <p>
+              LMP uses a cross-attention encoder-decoder architecture. The <strong>encoder</strong> attends to
+              observations and actions to autoregressively generate a variable-length sequence of latent tokens.
+              The <strong>decoder</strong> attends to observations and latent tokens to predict action chunks.
+              A EOS token terminates the reasoning chain, allowing the model to adaptively allocate its computation.
+            </p>
+            <p class="has-text-centered">
+              <iframe class="lmp-figframe" src="./fig_model_embed.html" title="LMP-&pi; architecture" scrolling="no"
+                loading="lazy"
+                style="width:100%;max-width:901px;aspect-ratio:901/356;border:0;display:block;margin:0 auto;"></iframe>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="hr"></div>
+
+
+  <!-- RQ1: A Performant Generative Control Policy -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Policy Experiments</h2>
+
+      <!-- Real-Robot (DROID) -->
+      <h3 class="title is-5 mt-4 has-text-left">Real-Robot (DROID)</h3>
+      <div class="columns is-centered">
+        <div class="column">
+          <div class="content has-text-justified">
+            <p>
+              We train language-conditioned LMP-&pi; and DP on the DROID dataset. Deployed zero-shot, LMP-&pi;
+              outperforms DP on block-bowl and marker-mug. We then finetune on two more tasks: peg-hole
+              and clean-table. LMP-&pi; demonstrates both precision and compositional generalization, notably picking up
+              at least two objects with 95% success in clean-table.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth" style="font-size: 0.9rem;">
+          <thead>
+            <tr>
+              <th rowspan="2"></th>
+              <th colspan="2" class="has-text-centered">Zero-Shot</th>
+              <th colspan="4" class="has-text-centered">Finetuned</th>
+            </tr>
+            <tr>
+              <th class="has-text-centered">block-bowl</th>
+              <th class="has-text-centered">marker-mug</th>
+              <th class="has-text-centered">peg-hole</th>
+              <th class="has-text-centered">clean-table (1/3)</th>
+              <th class="has-text-centered">clean-table (2/3)</th>
+              <th class="has-text-centered">clean-table (3/3)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>OpenVLA</td>
+              <td class="has-text-centered">0.30</td>
+              <td class="has-text-centered">0.00</td>
+              <td class="has-text-centered">0.30</td>
+              <td class="has-text-centered">0.85</td>
+              <td class="has-text-centered">0.30</td>
+              <td class="has-text-centered">0.05</td>
+            </tr>
+            <tr>
+              <td>DP</td>
+              <td class="has-text-centered">0.40</td>
+              <td class="has-text-centered">0.25</td>
+              <td class="has-text-centered">0.30</td>
+              <td class="has-text-centered">0.80</td>
+              <td class="has-text-centered">0.55</td>
+              <td class="has-text-centered">0.25</td>
+            </tr>
+            <tr>
+              <td><strong>LMP-&pi;</strong></td>
+              <td class="has-text-centered"><strong>0.65</strong></td>
+              <td class="has-text-centered"><strong>0.55</strong></td>
+              <td class="has-text-centered"><strong>0.70</strong></td>
+              <td class="has-text-centered"><strong>0.95</strong></td>
+              <td class="has-text-centered"><strong>0.95</strong></td>
+              <td class="has-text-centered"><strong>0.55</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Video Grids: LMP vs DP -->
+      <div class="content has-text-centered">
+        <div class="seg-toggle" id="droid-toggle">
+          <span class="seg-thumb"></span>
+          <button class="seg-btn is-active" onclick="showDroid('block_bowl', this)">Block-Bowl</button>
+          <button class="seg-btn" onclick="showDroid('marker_mug', this)">Marker-Mug</button>
+          <button class="seg-btn" onclick="showDroid('peg_hole', this)">Peg-Hole</button>
+          <button class="seg-btn" onclick="showDroid('clean_table', this)">Clean-Table</button>
+        </div>
+      </div>
+
+      <div id="droid-block_bowl" class="droid-eval-container" style="text-align:center; margin-top:1rem;">
+        <div class="columns is-centered is-vcentered" style="gap:2rem;">
+          <div class="column is-half has-text-centered">
+            <h4 class="title is-6">LMP-&pi;</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover" style="border-radius:6px;">
+              <source src="./static/videos/droid_eval_videos/block_bowl_lmp.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-half has-text-centered">
+            <h4 class="title is-6">DP</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover" style="border-radius:6px;">
+              <source src="./static/videos/droid_eval_videos/block_bowl_dp.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+
+      <div id="droid-marker_mug" class="droid-eval-container" style="display:none; text-align:center; margin-top:1rem;">
+        <div class="columns is-centered is-vcentered" style="gap:2rem;">
+          <div class="column is-half has-text-centered">
+            <h4 class="title is-6">LMP-&pi;</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover" style="border-radius:6px;">
+              <source src="./static/videos/droid_eval_videos/marker_mug_lmp.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-half has-text-centered">
+            <h4 class="title is-6">DP</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover" style="border-radius:6px;">
+              <source src="./static/videos/droid_eval_videos/marker_mug_dp.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+
+      <div id="droid-peg_hole" class="droid-eval-container" style="display:none; text-align:center; margin-top:1rem;">
+        <div class="columns is-centered is-vcentered" style="gap:2rem;">
+          <div class="column is-half has-text-centered">
+            <h4 class="title is-6">LMP-&pi;</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover" style="border-radius:6px;">
+              <source src="./static/videos/droid_eval_videos/peg_hole_lmp.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-half has-text-centered">
+            <h4 class="title is-6">DP</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover" style="border-radius:6px;">
+              <source src="./static/videos/droid_eval_videos/peg_hole_dp.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+
+      <div id="droid-clean_table" class="droid-eval-container"
+        style="display:none; text-align:center; margin-top:1rem;">
+        <div class="columns is-centered is-vcentered" style="gap:2rem;">
+          <div class="column is-half has-text-centered">
+            <h4 class="title is-6">LMP-&pi;</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover" style="border-radius:6px;">
+              <source src="./static/videos/droid_eval_videos/clean_table_lmp.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-half has-text-centered">
+            <h4 class="title is-6">DP</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover" style="border-radius:6px;">
+              <source src="./static/videos/droid_eval_videos/clean_table_dp.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simulation (LIBERO-90) -->
+      <h3 class="title is-5 mt-6 has-text-left">Simulation (LIBERO-90)</h3>
+      <div class="columns is-centered">
+        <div class="column">
+          <div class="content has-text-justified">
+            <p>
+              On language-conditioned multitask LIBERO-90, LMP-&pi; performs marginally better than DP across the board,
+              but a closer look reveals significantly higher success on the bottom-10 tasks. This indicates that
+              LMP-&pi; organizes information with less cross-task interference. The per-task breakdown below
+              shows LMP-&pi; tapering off at a slower rate than DP.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-centered">
+        <div class="column is-half">
+          <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth" style="font-size: 0.9rem;">
+            <thead>
+              <tr>
+                <th></th>
+                <th class="has-text-centered">All Tasks</th>
+                <th class="has-text-centered">Bottom-10 Tasks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>OpenVLA</td>
+                <td class="has-text-centered">0.358 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.024</span></td>
+                <td class="has-text-centered">0.077 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.008</span></td>
+              </tr>
+              <tr>
+                <td>DP</td>
+                <td class="has-text-centered">0.909 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.004</span></td>
+                <td class="has-text-centered">0.463 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.011</span></td>
+              </tr>
+              <tr>
+                <td><strong>LMP-&pi;</strong></td>
+                <td class="has-text-centered"><strong>0.933</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.003</span></td>
+                <td class="has-text-centered"><strong>0.645</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.023</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="is-size-7 has-text-centered" style="color:#777;margin-bottom:.4rem;">
+        <em>Hover a bar to see task details.</em>
+      </p>
+      <iframe id="lmp-libero" src="./libero_dist.html" title="LIBERO-90 per-task distribution" allow="autoplay"
+        scrolling="no" loading="lazy" style="width:100%;border:0;display:block;height:640px;"></iframe>
+    </div>
+  </section>
+
+  <div class="hr"></div>
+
+  <!-- RQ2: An Effective Action Tokenizer -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Action Tokenizer Experiments</h2>
+      <div class="columns is-centered">
+        <div class="column">
+          <div class="content has-text-justified">
+            <p>
+              We can instantiate LMP as a variable-length discrete action tokenizer, LMP-tok, by dropping the
+              observation conditioning. When controlling for downstream autoregressive policies, LMP-tok
+              significantly outperforms all baselines and is the only method achieving nontrivial performance on the
+              RoboMimic tool-hang task.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="content has-text-centered">
+        <!-- Native grouped bar chart (replaces results_tokenizer.png); hovering a method
+             highlights its bars across both domains -->
+        <div id="tok-plot" style="max-width:620px; margin:0 auto;"></div>
+        <script>
+          groupedBarPlot('tok-plot', '#tok-table',
+            [{name: 'VQVAE', color: '#362149', col: 1},
+            {name: 'FAST', color: '#675988', col: 2},
+            {name: 'OAT', color: '#999DCC', col: 3},
+            {name: 'LMP-tok', color: '#D097AC', col: 4}],
+            [{name: 'Robomimic', vals: [0.29, 0.49, 0.47, 0.69]},
+            {name: 'LIBERO', vals: [0.14, 0.22, 0.31, 0.75]}]);
+        </script>
+      </div>
+
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <table id="tok-table" class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+            style="font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th>Task</th>
+                <th class="has-text-centered">VQ-VAE</th>
+                <th class="has-text-centered">FAST</th>
+                <th class="has-text-centered">OAT</th>
+                <th class="has-text-centered">LMP-tok</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>robomimic-lift</td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.82 <small
+                    style="color:#9a9a9a;">±0.06</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.98 <small
+                    style="color:#9a9a9a;">±0.02</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.97 <small
+                    style="color:#9a9a9a;">±0.02</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;"><strong>1.00</strong> <small
+                    style="color:#9a9a9a;">±0.00</small></td>
+              </tr>
+              <tr>
+                <td>robomimic-can</td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.32 <small
+                    style="color:#9a9a9a;">±0.08</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.57 <small
+                    style="color:#9a9a9a;">±0.12</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.57 <small
+                    style="color:#9a9a9a;">±0.08</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;"><strong>0.93</strong> <small
+                    style="color:#9a9a9a;">±0.02</small></td>
+              </tr>
+              <tr>
+                <td>robomimic-square</td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.02 <small
+                    style="color:#9a9a9a;">±0.02</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.42 <small
+                    style="color:#9a9a9a;">±0.10</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.32 <small
+                    style="color:#9a9a9a;">±0.08</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;"><strong>0.67</strong> <small
+                    style="color:#9a9a9a;">±0.10</small></td>
+              </tr>
+              <tr>
+                <td>robomimic-tool-hang</td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.00 <small
+                    style="color:#9a9a9a;">±0.00</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.00 <small
+                    style="color:#9a9a9a;">±0.00</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.00 <small
+                    style="color:#9a9a9a;">±0.00</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;"><strong>0.17</strong> <small
+                    style="color:#9a9a9a;">±0.02</small></td>
+              </tr>
+              <tr style="background:#f0ecf7;">
+                <td><em>robomimic average</em></td>
+                <td class="has-text-centered">0.29</td>
+                <td class="has-text-centered">0.49</td>
+                <td class="has-text-centered">0.47</td>
+                <td class="has-text-centered"><strong>0.69</strong></td>
+              </tr>
+              <tr>
+                <td>libero-soup-cheese</td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.18 <small
+                    style="color:#9a9a9a;">±0.05</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.22 <small
+                    style="color:#9a9a9a;">±0.13</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.15 <small
+                    style="color:#9a9a9a;">±0.04</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;"><strong>0.92</strong> <small
+                    style="color:#9a9a9a;">±0.05</small></td>
+              </tr>
+              <tr>
+                <td>libero-mug-mug</td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.28 <small
+                    style="color:#9a9a9a;">±0.02</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.10 <small
+                    style="color:#9a9a9a;">±0.04</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.23 <small
+                    style="color:#9a9a9a;">±0.02</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;"><strong>0.88</strong> <small
+                    style="color:#9a9a9a;">±0.06</small></td>
+              </tr>
+              <tr>
+                <td>libero-moka-moka</td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.00 <small
+                    style="color:#9a9a9a;">±0.00</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.02 <small
+                    style="color:#9a9a9a;">±0.02</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.17 <small
+                    style="color:#9a9a9a;">±0.08</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;"><strong>0.63</strong> <small
+                    style="color:#9a9a9a;">±0.08</small></td>
+              </tr>
+              <tr>
+                <td>libero-bowl-drawer</td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.02 <small
+                    style="color:#9a9a9a;">±0.02</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.37 <small
+                    style="color:#9a9a9a;">±0.09</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.60 <small
+                    style="color:#9a9a9a;">±0.07</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;"><strong>0.75</strong> <small
+                    style="color:#9a9a9a;">±0.08</small></td>
+              </tr>
+              <tr>
+                <td>libero-book-caddy</td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.23 <small
+                    style="color:#9a9a9a;">±0.06</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.40 <small
+                    style="color:#9a9a9a;">±0.07</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;">0.42 <small
+                    style="color:#9a9a9a;">±0.10</small></td>
+                <td class="has-text-centered" style="white-space:nowrap;"><strong>0.57</strong> <small
+                    style="color:#9a9a9a;">±0.06</small></td>
+              </tr>
+              <tr style="background:#f0ecf7;">
+                <td><em>libero average</em></td>
+                <td class="has-text-centered">0.14</td>
+                <td class="has-text-centered">0.22</td>
+                <td class="has-text-centered">0.31</td>
+                <td class="has-text-centered"><strong>0.75</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- LMP-tok rollouts: all rollouts per suite shown at once, toggled by test suite -->
+      <div class="content has-text-centered" style="margin-top: 1.5rem;">
+        <div class="seg-toggle" id="tok-suite-toggle" style="max-width: 320px;">
+          <span class="seg-thumb" style="width: calc((100% - 8px) / 2);"></span>
+          <button class="seg-btn is-active" onclick="showTokSuite('robomimic', this)">RoboMimic</button>
+          <button class="seg-btn" onclick="showTokSuite('libero', this)">LIBERO</button>
+        </div>
+      </div>
+
+      <div id="tok-robomimic" class="tok-suite-grid" style="margin-top: 1rem;">
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:26px;">
+          <div style="flex:0 0 171px; width:171px;">
+            <h4 class="title is-6 has-text-centered" style="margin-bottom:0.6rem;">lift</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block; margin-bottom:16px;">
+              <source src="./static/videos/tokenizer_rollouts/robomimic-lift_0.mp4" type="video/mp4">
+            </video>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block;">
+              <source src="./static/videos/tokenizer_rollouts/robomimic-lift_1.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div style="flex:0 0 171px; width:171px;">
+            <h4 class="title is-6 has-text-centered" style="margin-bottom:0.6rem;">can</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block; margin-bottom:16px;">
+              <source src="./static/videos/tokenizer_rollouts/robomimic-can_0.mp4" type="video/mp4">
+            </video>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block;">
+              <source src="./static/videos/tokenizer_rollouts/robomimic-can_1.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div style="flex:0 0 171px; width:171px;">
+            <h4 class="title is-6 has-text-centered" style="margin-bottom:0.6rem;">square</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block; margin-bottom:16px;">
+              <source src="./static/videos/tokenizer_rollouts/robomimic-square_0.mp4" type="video/mp4">
+            </video>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block;">
+              <source src="./static/videos/tokenizer_rollouts/robomimic-square_1.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div style="flex:0 0 171px; width:171px;">
+            <h4 class="title is-6 has-text-centered" style="margin-bottom:0.6rem;">tool-hang</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block; margin-bottom:16px;">
+              <source src="./static/videos/tokenizer_rollouts/robomimic-tool-hang_0.mp4" type="video/mp4">
+            </video>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block;">
+              <source src="./static/videos/tokenizer_rollouts/robomimic-tool-hang_1.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+      <div id="tok-libero" class="tok-suite-grid" style="margin-top: 1rem; display:none;">
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:26px;">
+          <div style="flex:0 0 171px; width:171px;">
+            <h4 class="title is-6 has-text-centered" style="margin-bottom:0.6rem;">book-caddy</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block; margin-bottom:16px;">
+              <source src="./static/videos/tokenizer_rollouts/libero-book-caddy_0.mp4" type="video/mp4">
+            </video>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block;">
+              <source src="./static/videos/tokenizer_rollouts/libero-book-caddy_1.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div style="flex:0 0 171px; width:171px;">
+            <h4 class="title is-6 has-text-centered" style="margin-bottom:0.6rem;">bowl-drawer</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block; margin-bottom:16px;">
+              <source src="./static/videos/tokenizer_rollouts/libero-bowl-drawer_0.mp4" type="video/mp4">
+            </video>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block;">
+              <source src="./static/videos/tokenizer_rollouts/libero-bowl-drawer_1.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div style="flex:0 0 171px; width:171px;">
+            <h4 class="title is-6 has-text-centered" style="margin-bottom:0.6rem;">moka-moka</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block; margin-bottom:16px;">
+              <source src="./static/videos/tokenizer_rollouts/libero-moka-moka_0.mp4" type="video/mp4">
+            </video>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block;">
+              <source src="./static/videos/tokenizer_rollouts/libero-moka-moka_1.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div style="flex:0 0 171px; width:171px;">
+            <h4 class="title is-6 has-text-centered" style="margin-bottom:0.6rem;">mug-mug</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block; margin-bottom:16px;">
+              <source src="./static/videos/tokenizer_rollouts/libero-mug-mug_0.mp4" type="video/mp4">
+            </video>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block;">
+              <source src="./static/videos/tokenizer_rollouts/libero-mug-mug_1.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div style="flex:0 0 171px; width:171px;">
+            <h4 class="title is-6 has-text-centered" style="margin-bottom:0.6rem;">soup-cheese</h4>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block; margin-bottom:16px;">
+              <source src="./static/videos/tokenizer_rollouts/libero-soup-cheese_0.mp4" type="video/mp4">
+            </video>
+            <video autoplay muted loop playsinline loading="lazy" class="video-hover"
+              style="border-radius:6px; width:100%; display:block;">
+              <source src="./static/videos/tokenizer_rollouts/libero-soup-cheese_1.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="hr"></div>
+
+  <!-- Analysis -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Analysis</h2>
+
+      <!-- Does the model adaptively allocate test-time compute? -->
+      <h3 class="title is-5 mt-6 has-text-left">Does the model adaptively allocate test-time compute?</h3>
+      <div class="columns is-centered">
+        <div class="column">
+          <div class="content has-text-justified">
+            <p>
+              We visualize the number of reasoning steps generated during rollouts. The model uses fewer reasoning steps
+              during gripper movements, e.g., grasping and releasing in DROID tasks or hand-over in
+              RoboMimic transport.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h4 class="title is-6 mt-5 has-text-left">DROID Tasks</h4>
+      <div class="content has-text-centered">
+        <div class="seg-toggle">
+          <span class="seg-thumb"></span>
+          <button class="seg-btn is-active" onclick="rtTask('droid-rt', 0, this)">Block-Bowl</button>
+          <button class="seg-btn" onclick="rtTask('droid-rt', 1, this)">Marker-Mug</button>
+          <button class="seg-btn" onclick="rtTask('droid-rt', 2, this)">Peg-Hole</button>
+          <button class="seg-btn" onclick="rtTask('droid-rt', 3, this)">Clean-Table</button>
+        </div>
+      </div>
+      <div id="droid-rt">
+        <div class="rt-carousel" data-base="./static/videos/droid_reasoning_videos" data-eps="5" data-task="block-bowl">
+        </div>
+        <div class="rt-carousel" data-base="./static/videos/droid_reasoning_videos" data-eps="5" data-task="marker-mug"
+          style="display:none"></div>
+        <div class="rt-carousel" data-base="./static/videos/droid_reasoning_videos" data-eps="5" data-task="peg-hole"
+          style="display:none"></div>
+        <div class="rt-carousel" data-base="./static/videos/droid_reasoning_videos" data-eps="5" data-task="clean-table"
+          style="display:none"></div>
+      </div>
+
+      <h4 class="title is-6 mt-5 has-text-left">Simulation Tasks</h4>
+      <div class="content has-text-centered">
+        <div class="seg-toggle">
+          <span class="seg-thumb"></span>
+          <button class="seg-btn is-active" onclick="rtTask('sim-rt', 0, this)">Stacking</button>
+          <button class="seg-btn" onclick="rtTask('sim-rt', 1, this)">Square</button>
+          <button class="seg-btn" onclick="rtTask('sim-rt', 2, this)">Tool Hang</button>
+          <button class="seg-btn" onclick="rtTask('sim-rt', 3, this)">Transport</button>
+        </div>
+      </div>
+      <div id="sim-rt">
+        <div class="rt-carousel" data-base="./static/videos/sim_reasoning_videos" data-eps="5"
+          data-task="d3il_stacking"></div>
+        <div class="rt-carousel" data-base="./static/videos/sim_reasoning_videos" data-eps="5"
+          data-task="robomimic_square" style="display:none"></div>
+        <div class="rt-carousel" data-base="./static/videos/sim_reasoning_videos" data-eps="5"
+          data-task="robomimic_tool_hang" style="display:none"></div>
+        <div class="rt-carousel" data-base="./static/videos/sim_reasoning_videos" data-eps="5"
+          data-task="robomimic_transport" style="display:none"></div>
+      </div>
+
+      <!-- Qualitative Analysis: sliding-block reasoning probe -->
+      <h4 class="title is-6 mt-5 has-text-left">Probing Task</h4>
+      <div class="columns is-centered">
+        <div class="column">
+          <div class="content has-text-justified">
+            <p>
+              We manually slide a block through the open gripper while querying the policy for the number of reasoning
+              steps at each state. The reasoning length shifts with the block's position relative to the gripper.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="rt-carousel" data-base="./static/videos/sim_analysis_videos" data-eps="5" data-task="."></div>
+
+      <!-- Does iterative computation help? -->
+      <h3 class="title is-5 mt-5 has-text-left">Does iterative computation help?</h3>
+      <div class="columns is-centered">
+        <div class="column">
+          <div class="content has-text-justified">
+            <p>
+              We compare LMP-&pi; to two non-iterative latent-variable baselines: Gaussian <strong>VAE Policy</strong>
+              and <strong>VQ-BeT</strong>. LMP-&pi; consistently outperforms both on D3IL and RoboMimic, indicating that
+              fixed-length latent representations lack the granularity needed for complex manipulation tasks.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="content has-text-centered">
+        <!-- Native grouped bar chart (replaces results_singletask.png); hover a method to
+             highlight it across domains and in the table below -->
+        <div id="st-plot" style="max-width:540px; margin:0 auto;"></div>
+        <script>
+          groupedBarPlot('st-plot', '#st-table',
+            [{name: 'VQ-BeT', color: '#675988', col: 1},
+            {name: 'VAE', color: '#999DCC', col: 2},
+            {name: 'LMP-&pi;', color: '#D097AC', col: 3}],
+            [{name: 'D3IL', vals: [0.39, 0.57, 0.76]},
+            {name: 'Robomimic', vals: [0.56, 0.68, 0.83]}]);
+        </script>
+      </div>
+
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <table id="st-table" class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+            style="font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th>Task</th>
+                <th class="has-text-centered">VQ-BeT</th>
+                <th class="has-text-centered">VAE</th>
+                <th class="has-text-centered">LMP-&pi;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>d3il-aligning</td>
+                <td class="has-text-centered">0.23 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.03</span></td>
+                <td class="has-text-centered">0.51 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.07</span></td>
+                <td class="has-text-centered"><strong>0.71</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.04</span></td>
+              </tr>
+              <tr>
+                <td>d3il-stacking</td>
+                <td class="has-text-centered">0.53 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.03</span></td>
+                <td class="has-text-centered">0.71 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.07</span></td>
+                <td class="has-text-centered"><strong>0.86</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.04</span></td>
+              </tr>
+              <tr>
+                <td>d3il-sorting-2</td>
+                <td class="has-text-centered">0.46 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.02</span></td>
+                <td class="has-text-centered">0.67 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.13</span></td>
+                <td class="has-text-centered"><strong>0.80</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.01</span></td>
+              </tr>
+              <tr>
+                <td>d3il-sorting-4</td>
+                <td class="has-text-centered">0.41 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.01</span></td>
+                <td class="has-text-centered">0.68 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.04</span></td>
+                <td class="has-text-centered"><strong>0.68</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.02</span></td>
+              </tr>
+              <tr>
+                <td>d3il-sorting-6</td>
+                <td class="has-text-centered">0.32 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.04</span></td>
+                <td class="has-text-centered">0.70 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.04</span></td>
+                <td class="has-text-centered"><strong>0.75</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.04</span></td>
+              </tr>
+              <tr style="background:#f0ecf7;">
+                <td><em>d3il average</em></td>
+                <td class="has-text-centered">0.39</td>
+                <td class="has-text-centered">0.57</td>
+                <td class="has-text-centered"><strong>0.76</strong></td>
+              </tr>
+              <tr>
+                <td>robomimic-lift</td>
+                <td class="has-text-centered">0.96 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.00</span></td>
+                <td class="has-text-centered">0.97 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.01</span></td>
+                <td class="has-text-centered"><strong>1.00</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.00</span></td>
+              </tr>
+              <tr>
+                <td>robomimic-can</td>
+                <td class="has-text-centered">0.83 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.04</span></td>
+                <td class="has-text-centered">0.78 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.07</span></td>
+                <td class="has-text-centered"><strong>1.00</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.00</span></td>
+              </tr>
+              <tr>
+                <td>robomimic-square</td>
+                <td class="has-text-centered">0.58 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.06</span></td>
+                <td class="has-text-centered">0.79 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.08</span></td>
+                <td class="has-text-centered"><strong>0.87</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.02</span></td>
+              </tr>
+              <tr>
+                <td>robomimic-tool-hang</td>
+                <td class="has-text-centered">0.15 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.04</span></td>
+                <td class="has-text-centered">0.29 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.06</span></td>
+                <td class="has-text-centered"><strong>0.51</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.08</span></td>
+              </tr>
+              <tr>
+                <td>robomimic-transport</td>
+                <td class="has-text-centered">0.26 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.05</span></td>
+                <td class="has-text-centered">0.58 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.12</span></td>
+                <td class="has-text-centered"><strong>0.75</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.08</span></td>
+              </tr>
+              <tr style="background:#f0ecf7;">
+                <td><em>robomimic average</em></td>
+                <td class="has-text-centered">0.56</td>
+                <td class="has-text-centered">0.68</td>
+                <td class="has-text-centered"><strong>0.83</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Does compression contribute? -->
+      <h3 class="title is-5 mt-6 has-text-left">Does compression contribute to performance?</h3>
+      <div class="columns is-centered">
+        <div class="column">
+          <div class="content has-text-justified">
+            <p>
+              We ablate compression strength by controlling the decoder variance schedule. A smaller
+              &sigma;<sub>min</sub> penalizes prediction errors more heavily, yielding shorter latent traces. Across
+              LIBERO tasks, increasing compression (smaller &sigma;<sub>min</sub>) improves performance, showing that
+              parsimonious allocation of latent tokens is crucial for generalization.
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- Variance-schedule ablation table -->
+      <div class="columns is-centered">
+        <div class="column is-half has-text-centered">
+          <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth" style="font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th>&sigma;<sub>max</sub> &rarr; &sigma;<sub>min</sub></th>
+                <th class="has-text-centered">All Tasks</th>
+                <th class="has-text-centered">Bottom-10 Tasks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0.1 &rarr; 0.01</td>
+                <td class="has-text-centered"><strong>0.933</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.003</span></td>
+                <td class="has-text-centered"><strong>0.645</strong> <span
+                    style="color:#9a9a9a; font-size:0.8em;">&pm;0.023</span></td>
+              </tr>
+              <tr>
+                <td>0.1 &rarr; 0.03</td>
+                <td class="has-text-centered">0.913 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.001</span></td>
+                <td class="has-text-centered">0.567 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.006</span></td>
+              </tr>
+              <tr>
+                <td>0.1 &rarr; 0.05</td>
+                <td class="has-text-centered">0.870 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.012</span></td>
+                <td class="has-text-centered">0.450 <span style="color:#9a9a9a; font-size:0.8em;">&pm;0.045</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Compression trade-off -->
+      <div class="columns is-centered">
+        <div class="column">
+          <div class="content has-text-justified">
+            <p>
+              On DROID checkpoints, we find that too little compression (0.1-0.08) causes the decoder to ignore the
+              latents;
+              too much (0.1-0.01) forces overly short traces and raises reconstruction error; we use a balanced
+              schedule (0.2-0.02) in our experiments.
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- Compression analysis figure -->
+      <div class="columns is-centered">
+        <div class="column is-four-fifth has-text-centered">
+          <img src="./static/images/analysis_compression.png" style="width:100%; border-radius:8px;"
+            alt="Effect of compression">
+        </div>
+      </div>
+
+      <!-- More Analysis: secondary results, one slide at a time (text + plot scroll together) -->
+      <h4 class="title is-5 mt-5 has-text-left">More Analysis</h4>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button id="ma-prev" aria-label="Previous"
+          style="flex:none; background:none; border:1px solid #ccc; border-radius:50%; width:36px; height:36px; cursor:pointer; font-size:1.1rem; line-height:1;">&#8592;</button>
+        <div style="flex:1; overflow:hidden;">
+          <div id="ma-track"
+            style="display:flex; transition:transform .45s cubic-bezier(0.4, 0, 0.2, 1); will-change:transform;">
+            <!-- (a) latent length over training -->
+            <div style="flex:0 0 100%; min-width:0; padding:0 6px;">
+              <div class="content has-text-justified">
+                <p>
+                  <strong>Latent length over training</strong> We find the reasoning length to increase
+                  spontaneously throughout training. The length is initially low because of high
+                  reconstruction errors, then increases as training converges.
+                </p>
+              </div>
+              <div class="has-text-centered">
+                <img src="./static/images/training_latent_length.png" loading="lazy"
+                  style="width:min(90%, 520px); border-radius:8px;" alt="Posterior latent length over training">
+
+              </div>
+            </div>
+            <!-- (b) reasoning length vs action variance -->
+            <div style="flex:0 0 100%; min-width:0; padding:0 6px;">
+              <div class="content has-text-justified">
+                <p>
+                  <strong>Reasoning length vs. action variance</strong> We find reasoning length to be negatively
+                  correlated
+                  with nearest-neighbor action variance. The variance can be largely attributed to binarized gripper
+                  actions timed differently across demonstrations, resulting in the model spending less compute during
+                  gripper movements.
+                </p>
+              </div>
+              <div class="has-text-centered">
+                <img src="./static/images/analysis_knn.png" loading="lazy"
+                  style="width:min(80%, 480px); border-radius:8px;" alt="Reasoning length vs KNN action variance">
+              </div>
+            </div>
+            <!-- (c) reasoning and multimodality -->
+            <div style="flex:0 0 100%; min-width:0; padding:0 6px;">
+              <div class="content has-text-justified">
+                <p>
+                  <strong> Reasoning and multimodality </strong> We visualize rollouts on the D3IL avoiding task as the
+                  maximum number of latent steps is truncated. The policy becomes effectively deterministic as the
+                  latent
+                  length decreases to zero, yet it remains <em>mode-seeking</em> rather than mode-averaging.
+                </p>
+              </div>
+              <div class="has-text-centered">
+                <img src="./static/images/ablation_multimodality.png" loading="lazy"
+                  style="width:min(100%, 640px); border-radius:8px;" alt="Mode-seeking under truncated latent steps">
+              </div>
+            </div>
+          </div>
+        </div>
+        <button id="ma-next" aria-label="Next"
+          style="flex:none; background:none; border:1px solid #ccc; border-radius:50%; width:36px; height:36px; cursor:pointer; font-size:1.1rem; line-height:1;">&#8594;</button>
+      </div>
+      <div id="ma-dots" style="display:flex; justify-content:center; gap:8px; margin-top:14px;"></div>
+      <script>
+        (function () {
+          try {
+            var track = document.getElementById('ma-track');
+            var dots = document.getElementById('ma-dots');
+            var N = track.children.length, i = 0;
+            for (var k = 0; k < N; k++) (function (k) {
+              var d = document.createElement('div');
+              d.style.cssText = 'width:9px; height:9px; border-radius:50%; background:#ccc; cursor:pointer; transition:background .2s;';
+              d.addEventListener('click', function () {show(k);});
+              dots.appendChild(d);
+            })(k);
+            function show(k) {
+              i = ((k % N) + N) % N;
+              track.style.transform = 'translateX(' + (-i * 100) + '%)';
+              for (var j = 0; j < N; j++) dots.children[j].style.background = (j === i) ? '#6a4fb4' : '#ccc';
+            }
+            document.getElementById('ma-prev').addEventListener('click', function () {show(i - 1);});
+            document.getElementById('ma-next').addEventListener('click', function () {show(i + 1);});
+            show(0);
+          } catch (e) {console.error('ma-carousel:', e);}
+        })();
+      </script>
+
+
+    </div>
+  </section>
+
+  <div class="hr"></div>
+
+  <!-- LMP embedded figures + LIBERO distribution: replay on scroll, auto-size libero iframe -->
+  <script>
+    (function () {
+      var frames = [].slice.call(document.querySelectorAll('iframe.lmp-figframe'));
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (es) {
+          es.forEach(function (e) {
+            if (e.isIntersecting && e.target.contentWindow)
+              e.target.contentWindow.postMessage({type: 'lmp-play'}, '*');
+          });
+        }, {threshold: 0.35});
+        frames.forEach(function (f) {io.observe(f);});
+      }
+      window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'lmp-libero-height') {
+          var f = document.getElementById('lmp-libero');
+          if (f && e.data.h) f.style.height = (e.data.h + 6) + 'px';
+        }
+      });
+    }());
+  </script>
+</body>
+
+</html>
