@@ -36,7 +36,7 @@
           eos: '\\texttt{eos}'
         }
       },
-      svg: {fontCache: 'global'}
+      svg: { fontCache: 'global' }
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
@@ -138,11 +138,11 @@
               (function () {
                 try {
                   const EPISODES = [
-                    {path: 'episode_1', totalFrames: 279, instruction: 'Put objects into bowl', stepLens: [14.9375, 14.96875, 9.65625, 15.40625, 5.328125, 15.515625, 15.484375, 15.03125, 9.296875, 15.4375, 4.078125, 14.9375, 15.6875, 14.25, 10.046875, 15.375, 5.84375, 15.390625]},
-                    {path: 'episode_2', totalFrames: 205, instruction: 'Put objects into bowl', stepLens: [15.46875, 15.515625, 15.375, 6.671875, 11.265625, 14.515625, 4.28125, 15.0, 15.140625, 6.59375, 15.53125, 5.375, 14.640625]},
-                    {path: 'episode_3', totalFrames: 273, instruction: 'Insert peg into hole', stepLens: [15.21875, 15.40625, 14.921875, 6.25, 12.078125, 15.59375, 15.59375, 15.28125, 15.703125, 15.59375, 15.625, 15.515625, 14.96875, 14.875, 15.453125, 3.625, 4.578125, 15.40625]},
-                    {path: 'episode_4', totalFrames: 136, instruction: 'Pick up the block and put it in the bowl', stepLens: [12.84375, 13.203125, 13.234375, 8.59375, 12.8125, 13.71875, 12.578125, 6.21875, 12.1875]},
-                    {path: 'episode_5', totalFrames: 161, instruction: 'Pick up the marker and put it in the mug', stepLens: [12.875, 13.390625, 14.46875, 8.21875, 13.671875, 12.734375, 13.578125, 9.453125, 8.078125, 13.296875, 14.421875]},
+                    { path: 'episode_1', totalFrames: 279, instruction: 'Put objects into bowl', stepLens: [14.9375, 14.96875, 9.65625, 15.40625, 5.328125, 15.515625, 15.484375, 15.03125, 9.296875, 15.4375, 4.078125, 14.9375, 15.6875, 14.25, 10.046875, 15.375, 5.84375, 15.390625] },
+                    { path: 'episode_2', totalFrames: 205, instruction: 'Put objects into bowl', stepLens: [15.46875, 15.515625, 15.375, 6.671875, 11.265625, 14.515625, 4.28125, 15.0, 15.140625, 6.59375, 15.53125, 5.375, 14.640625] },
+                    { path: 'episode_3', totalFrames: 273, instruction: 'Insert peg into hole', stepLens: [15.21875, 15.40625, 14.921875, 6.25, 12.078125, 15.59375, 15.59375, 15.28125, 15.703125, 15.59375, 15.625, 15.515625, 14.96875, 14.875, 15.453125, 3.625, 4.578125, 15.40625] },
+                    { path: 'episode_4', totalFrames: 136, instruction: 'Pick up the block and put it in the bowl', stepLens: [12.84375, 13.203125, 13.234375, 8.59375, 12.8125, 13.71875, 12.578125, 6.21875, 12.1875] },
+                    { path: 'episode_5', totalFrames: 161, instruction: 'Pick up the marker and put it in the mug', stepLens: [12.875, 13.390625, 14.46875, 8.21875, 13.671875, 12.734375, 13.578125, 9.453125, 8.078125, 13.296875, 14.421875] },
                   ];
                   const ACTION_CHUNK = 16;
 
@@ -213,7 +213,7 @@
                   }
                   // Playhead via compositor transforms (translateX/scaleX): no layout work, sub-pixel smooth.
                   let trackW = 0;
-                  function measureTrack() {trackW = scrub.clientWidth;}
+                  function measureTrack() { trackW = scrub.clientWidth; }
                   window.addEventListener('resize', measureTrack);
                   let lastPx = -1;
                   function setPlayhead(pos) {
@@ -244,7 +244,7 @@
                   }
                   scene.addEventListener('seeked', () => {
                     if (seekTarget === null) return;
-                    if (Math.abs(scene.currentTime * FPS - seekTarget) <= 1.5) {seekTarget = null; return;}
+                    if (Math.abs(scene.currentTime * FPS - seekTarget) <= 1.5) { seekTarget = null; return; }
                     if (scene.seeking) return;   // superseded drag seek committed; the real one is still in flight
                     if (seekRetries < 3) {
                       seekRetries++;
@@ -272,10 +272,10 @@
                     if (onReadyRef) scene.removeEventListener('loadeddata', onReadyRef);
                     onReadyRef = () => {
                       onReadyRef = null;
-                      if (seekTarget === null && frame === 0) {scene.currentTime = 0; wrist.currentTime = 0;}
+                      if (seekTarget === null && frame === 0) { scene.currentTime = 0; wrist.currentTime = 0; }
                       if (playing) startPlay();
                     };
-                    scene.addEventListener('loadeddata', onReadyRef, {once: true});
+                    scene.addEventListener('loadeddata', onReadyRef, { once: true });
                     scene.src = `./static/teaser/${ep.path}/scene.mp4`;
                     wrist.src = `./static/teaser/${ep.path}/wrist.mp4`;
                     scene.load(); wrist.load();
@@ -283,14 +283,14 @@
 
                   // rAF loop: pinned while seeking; otherwise wrist sync + metronome playhead.
                   function tick() {
-                    if (!playing || suspended) {animId = null; return;}
+                    if (!playing || suspended) { animId = null; return; }
                     const ep = EPISODES[currentEp];
                     if (seekTarget !== null) {
                       setFrameUI(seekTarget);
                     } else {
                       // Sync wrist via playbackRate nudge (hard seeks flush the decoder = hitches).
                       const drift = wrist.currentTime - scene.currentTime;
-                      if (Math.abs(drift) > 0.5) {wrist.currentTime = scene.currentTime; wrist.playbackRate = 1;}
+                      if (Math.abs(drift) > 0.5) { wrist.currentTime = scene.currentTime; wrist.playbackRate = 1; }
                       else {
                         const rate = Math.max(0.9, Math.min(1.1, 1 - drift * 0.5));
                         if (Math.abs(wrist.playbackRate - rate) > 0.004) wrist.playbackRate = rate;
@@ -303,8 +303,8 @@
                         const target = Math.min(scene.currentTime * FPS, ep.totalFrames - 1);
                         const lag = target - frame;
                         let f = frame;
-                        if (Math.abs(lag) > 8) {f = Math.round(target); mtNext = now + SLOT;}  // loop wrap / stall
-                        else if (lag >= 1) {f = frame + 1; mtNext += SLOT;}                    // normal tick
+                        if (Math.abs(lag) > 8) { f = Math.round(target); mtNext = now + SLOT; }  // loop wrap / stall
+                        else if (lag >= 1) { f = frame + 1; mtNext += SLOT; }                    // normal tick
                         else mtNext += SLOT / 2;                                                 // ahead: brief hold
                         if (target - f > 2) mtNext = Math.min(mtNext, now + SLOT / 2);           // gentle catch-up
                         if (mtNext < now - 200) mtNext = now;                                    // shed jank debt
@@ -324,7 +324,7 @@
                     playing = false;
                     playBtn.textContent = 'Play';
                     scene.pause(); wrist.pause();
-                    if (animId) {cancelAnimationFrame(animId); animId = null;}
+                    if (animId) { cancelAnimationFrame(animId); animId = null; }
                   }
 
                   // Suspend decode + rAF while off-screen or tab-hidden; `playing` keeps user intent.
@@ -333,7 +333,7 @@
                     const v = outOfView || tabHidden;
                     if (v === suspended) return;
                     suspended = v;
-                    if (v) {scene.pause(); wrist.pause();}
+                    if (v) { scene.pause(); wrist.pause(); }
                     else if (playing) {
                       scene.play().catch(() => { }); wrist.play().catch(() => { });
                       if (!animId) animId = requestAnimationFrame(tick);
@@ -343,9 +343,9 @@
                     new IntersectionObserver(es => {
                       outOfView = !es[es.length - 1].isIntersecting;
                       updateSuspend();
-                    }, {threshold: 0}).observe(document.getElementById('teaser-player'));
+                    }, { threshold: 0 }).observe(document.getElementById('teaser-player'));
                   }
-                  document.addEventListener('visibilitychange', () => {tabHidden = document.hidden; updateSuspend();});
+                  document.addEventListener('visibilitychange', () => { tabHidden = document.hidden; updateSuspend(); });
 
                   // Drag anywhere on the scrub row; videos pause during the drag, resume on release.
                   function frameFromEvent(e) {
@@ -353,27 +353,27 @@
                     const t = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
                     return Math.round(t * (EPISODES[currentEp].totalFrames - 1));
                   }
-                  const scrubMove = e => {e.preventDefault(); seekTo(frameFromEvent(e));};
+                  const scrubMove = e => { e.preventDefault(); seekTo(frameFromEvent(e)); };
                   const scrubUp = () => {
-                    if (dragResume) {dragResume = false; scene.play().catch(() => { }); wrist.play().catch(() => { });}
+                    if (dragResume) { dragResume = false; scene.play().catch(() => { }); wrist.play().catch(() => { }); }
                     window.removeEventListener('pointermove', scrubMove);
                     window.removeEventListener('pointerup', scrubUp);
                     window.removeEventListener('pointercancel', scrubUp);
                   };
                   scrub.addEventListener('pointerdown', e => {
                     e.preventDefault();
-                    if (playing) {dragResume = true; scene.pause(); wrist.pause();}
+                    if (playing) { dragResume = true; scene.pause(); wrist.pause(); }
                     seekTo(frameFromEvent(e));
                     window.addEventListener('pointermove', scrubMove);
                     window.addEventListener('pointerup', scrubUp);
                     window.addEventListener('pointercancel', scrubUp);
                   });
-                  playBtn.addEventListener('click', () => {playing ? stopPlay() : startPlay();});
+                  playBtn.addEventListener('click', () => { playing ? stopPlay() : startPlay(); });
                   prevBtn.addEventListener('click', () => switchEpisode((currentEp - 1 + EPISODES.length) % EPISODES.length));
                   nextBtn.addEventListener('click', () => switchEpisode((currentEp + 1) % EPISODES.length));
 
                   switchEpisode(0);
-                } catch (e) {console.error('Teaser error:', e);}
+                } catch (e) { console.error('Teaser error:', e); }
               })();
             </script>
 
@@ -458,7 +458,7 @@
               LMP uses a cross-attention encoder-decoder architecture. The <strong>encoder</strong> attends to
               observations and actions to autoregressively generate a variable-length sequence of latent tokens.
               The <strong>decoder</strong> attends to observations and latent tokens to predict action chunks.
-              A EOS token terminates the reasoning chain, allowing the model to adaptively allocate its computation.
+              An EOS token terminates the reasoning chain, allowing the model to adaptively allocate its computation.
             </p>
             <p class="has-text-centered">
               <iframe class="lmp-figframe" src="./fig_model_embed.html" title="LMP-&pi; architecture" scrolling="no"
@@ -485,8 +485,8 @@
         <div class="column">
           <div class="content has-text-justified">
             <p>
-              We train language-conditioned LMP-&pi; and DP on the DROID dataset. Deployed zero-shot, LMP-&pi;
-              outperforms DP on block-bowl and marker-mug. We then finetune on two more tasks: peg-hole
+              We train language-conditioned LMP-&pi;, OpenVLA, and DP on the DROID dataset. Deployed zero-shot, LMP-&pi;
+              outperforms OpenVLA and DP on block-bowl and marker-mug. We then finetune on two more tasks: peg-hole
               and clean-table. LMP-&pi; demonstrates both precision and compositional generalization, notably picking up
               at least two objects with 95% success in clean-table.
             </p>
@@ -629,8 +629,8 @@
         <div class="column">
           <div class="content has-text-justified">
             <p>
-              On language-conditioned multitask LIBERO-90, LMP-&pi; performs marginally better than DP across the board,
-              but a closer look reveals significantly higher success on the bottom-10 tasks. This indicates that
+              On language-conditioned multitask LIBERO-90, LMP-&pi; outperforms OpenVLA and DP across the board,
+              and a closer look reveals significantly higher margin on the bottom-10 tasks. This indicates that
               LMP-&pi; organizes information with less cross-task interference. The per-task breakdown below
               shows LMP-&pi; tapering off at a slower rate than DP.
             </p>
@@ -704,12 +704,12 @@
         <div id="tok-plot" style="max-width:620px; margin:0 auto;"></div>
         <script>
           groupedBarPlot('tok-plot', '#tok-table',
-            [{name: 'VQVAE', color: '#362149', col: 1},
-            {name: 'FAST', color: '#675988', col: 2},
-            {name: 'OAT', color: '#999DCC', col: 3},
-            {name: 'LMP-tok', color: '#D097AC', col: 4}],
-            [{name: 'Robomimic', vals: [0.29, 0.49, 0.47, 0.69]},
-            {name: 'LIBERO', vals: [0.14, 0.22, 0.31, 0.75]}]);
+            [{ name: 'VQVAE', color: '#362149', col: 1 },
+            { name: 'FAST', color: '#675988', col: 2 },
+            { name: 'OAT', color: '#999DCC', col: 3 },
+            { name: 'LMP-tok', color: '#D097AC', col: 4 }],
+            [{ name: 'Robomimic', vals: [0.29, 0.49, 0.47, 0.69] },
+            { name: 'LIBERO', vals: [0.14, 0.22, 0.31, 0.75] }]);
         </script>
       </div>
 
@@ -971,84 +971,15 @@
     <div class="container is-max-desktop">
       <h2 class="title is-3 has-text-centered">Analysis</h2>
 
-      <!-- Does the model adaptively allocate test-time compute? -->
-      <h3 class="title is-5 mt-6 has-text-left">Does the model adaptively allocate test-time compute?</h3>
+      <!-- Does variable-length latent computation outperform fixed-length latent computation? -->
+      <h3 class="title is-5 mt-6 has-text-left">Does variable-length latent computation outperform fixed-length latent
+        computation?</h3>
       <div class="columns is-centered">
         <div class="column">
           <div class="content has-text-justified">
             <p>
-              We visualize the number of reasoning steps generated during rollouts. The model uses fewer reasoning steps
-              during gripper movements, e.g., grasping and releasing in DROID tasks or hand-over in
-              RoboMimic transport.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <h4 class="title is-6 mt-5 has-text-left">DROID Tasks</h4>
-      <div class="content has-text-centered">
-        <div class="seg-toggle">
-          <span class="seg-thumb"></span>
-          <button class="seg-btn is-active" onclick="rtTask('droid-rt', 0, this)">Block-Bowl</button>
-          <button class="seg-btn" onclick="rtTask('droid-rt', 1, this)">Marker-Mug</button>
-          <button class="seg-btn" onclick="rtTask('droid-rt', 2, this)">Peg-Hole</button>
-          <button class="seg-btn" onclick="rtTask('droid-rt', 3, this)">Clean-Table</button>
-        </div>
-      </div>
-      <div id="droid-rt">
-        <div class="rt-carousel" data-base="./static/videos/droid_reasoning_videos" data-eps="5" data-task="block-bowl">
-        </div>
-        <div class="rt-carousel" data-base="./static/videos/droid_reasoning_videos" data-eps="5" data-task="marker-mug"
-          style="display:none"></div>
-        <div class="rt-carousel" data-base="./static/videos/droid_reasoning_videos" data-eps="5" data-task="peg-hole"
-          style="display:none"></div>
-        <div class="rt-carousel" data-base="./static/videos/droid_reasoning_videos" data-eps="5" data-task="clean-table"
-          style="display:none"></div>
-      </div>
-
-      <h4 class="title is-6 mt-5 has-text-left">Simulation Tasks</h4>
-      <div class="content has-text-centered">
-        <div class="seg-toggle">
-          <span class="seg-thumb"></span>
-          <button class="seg-btn is-active" onclick="rtTask('sim-rt', 0, this)">Stacking</button>
-          <button class="seg-btn" onclick="rtTask('sim-rt', 1, this)">Square</button>
-          <button class="seg-btn" onclick="rtTask('sim-rt', 2, this)">Tool Hang</button>
-          <button class="seg-btn" onclick="rtTask('sim-rt', 3, this)">Transport</button>
-        </div>
-      </div>
-      <div id="sim-rt">
-        <div class="rt-carousel" data-base="./static/videos/sim_reasoning_videos" data-eps="5"
-          data-task="d3il_stacking"></div>
-        <div class="rt-carousel" data-base="./static/videos/sim_reasoning_videos" data-eps="5"
-          data-task="robomimic_square" style="display:none"></div>
-        <div class="rt-carousel" data-base="./static/videos/sim_reasoning_videos" data-eps="5"
-          data-task="robomimic_tool_hang" style="display:none"></div>
-        <div class="rt-carousel" data-base="./static/videos/sim_reasoning_videos" data-eps="5"
-          data-task="robomimic_transport" style="display:none"></div>
-      </div>
-
-      <!-- Qualitative Analysis: sliding-block reasoning probe -->
-      <h4 class="title is-6 mt-5 has-text-left">Probing Task</h4>
-      <div class="columns is-centered">
-        <div class="column">
-          <div class="content has-text-justified">
-            <p>
-              We manually slide a block through the open gripper while querying the policy for the number of reasoning
-              steps at each state. The reasoning length shifts with the block's position relative to the gripper.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="rt-carousel" data-base="./static/videos/sim_analysis_videos" data-eps="5" data-task="."></div>
-
-      <!-- Does iterative computation help? -->
-      <h3 class="title is-5 mt-5 has-text-left">Does iterative computation help?</h3>
-      <div class="columns is-centered">
-        <div class="column">
-          <div class="content has-text-justified">
-            <p>
-              We compare LMP-&pi; to two non-iterative latent-variable baselines: Gaussian <strong>VAE Policy</strong>
-              and <strong>VQ-BeT</strong>. LMP-&pi; consistently outperforms both on D3IL and RoboMimic, indicating that
+              We compare LMP-&pi; to two fixed-length latent-variable baselines, Gaussian VAE Policy
+              and VQ-BeT. LMP-&pi; consistently outperforms both on D3IL and RoboMimic, indicating that
               fixed-length latent representations lack the granularity needed for complex manipulation tasks.
             </p>
           </div>
@@ -1060,11 +991,11 @@
         <div id="st-plot" style="max-width:540px; margin:0 auto;"></div>
         <script>
           groupedBarPlot('st-plot', '#st-table',
-            [{name: 'VQ-BeT', color: '#675988', col: 1},
-            {name: 'VAE', color: '#999DCC', col: 2},
-            {name: 'LMP-&pi;', color: '#D097AC', col: 3}],
-            [{name: 'D3IL', vals: [0.39, 0.57, 0.76]},
-            {name: 'Robomimic', vals: [0.56, 0.68, 0.83]}]);
+            [{ name: 'VQ-BeT', color: '#675988', col: 1 },
+            { name: 'VAE', color: '#999DCC', col: 2 },
+            { name: 'LMP-&pi;', color: '#D097AC', col: 3 }],
+            [{ name: 'D3IL', vals: [0.39, 0.65, 0.76] },
+            { name: 'Robomimic', vals: [0.56, 0.68, 0.83] }]);
         </script>
       </div>
 
@@ -1119,7 +1050,7 @@
               <tr style="background:#f0ecf7;">
                 <td><em>d3il average</em></td>
                 <td class="has-text-centered">0.39</td>
-                <td class="has-text-centered">0.57</td>
+                <td class="has-text-centered">0.65</td>
                 <td class="has-text-centered"><strong>0.76</strong></td>
               </tr>
               <tr>
@@ -1176,8 +1107,8 @@
             <p>
               We ablate compression strength by controlling the decoder variance schedule. A smaller
               &sigma;<sub>min</sub> penalizes prediction errors more heavily, yielding shorter latent traces. Across
-              LIBERO tasks, increasing compression (smaller &sigma;<sub>min</sub>) improves performance, showing that
-              parsimonious allocation of latent tokens is crucial for generalization.
+              LIBERO tasks, increasing compression (smaller &sigma;<sub>min</sub>) improves performance, suggesting that
+              parsimonious allocation of latent steps can prevent overfitting.
             </p>
           </div>
         </div>
@@ -1236,90 +1167,115 @@
         </div>
       </div>
 
-      <!-- More Analysis: secondary results, one slide at a time (text + plot scroll together) -->
-      <h4 class="title is-5 mt-5 has-text-left">More Analysis</h4>
-      <div style="display:flex; align-items:center; gap:12px;">
-        <button id="ma-prev" aria-label="Previous"
-          style="flex:none; background:none; border:1px solid #ccc; border-radius:50%; width:36px; height:36px; cursor:pointer; font-size:1.1rem; line-height:1;">&#8592;</button>
-        <div style="flex:1; overflow:hidden;">
-          <div id="ma-track"
-            style="display:flex; transition:transform .45s cubic-bezier(0.4, 0, 0.2, 1); will-change:transform;">
-            <!-- (a) latent length over training -->
-            <div style="flex:0 0 100%; min-width:0; padding:0 6px;">
-              <div class="content has-text-justified">
-                <p>
-                  <strong>Latent length over training</strong> We find the reasoning length to increase
-                  spontaneously throughout training. The length is initially low because of high
-                  reconstruction errors, then increases as training converges.
-                </p>
-              </div>
-              <div class="has-text-centered">
-                <img src="./static/images/training_latent_length.png" loading="lazy"
-                  style="width:min(90%, 520px); border-radius:8px;" alt="Posterior latent length over training">
-
-              </div>
-            </div>
-            <!-- (b) reasoning length vs action variance -->
-            <div style="flex:0 0 100%; min-width:0; padding:0 6px;">
-              <div class="content has-text-justified">
-                <p>
-                  <strong>Reasoning length vs. action variance</strong> We find reasoning length to be negatively
-                  correlated
-                  with nearest-neighbor action variance. The variance can be largely attributed to binarized gripper
-                  actions timed differently across demonstrations, resulting in the model spending less compute during
-                  gripper movements.
-                </p>
-              </div>
-              <div class="has-text-centered">
-                <img src="./static/images/analysis_knn.png" loading="lazy"
-                  style="width:min(80%, 480px); border-radius:8px;" alt="Reasoning length vs KNN action variance">
-              </div>
-            </div>
-            <!-- (c) reasoning and multimodality -->
-            <div style="flex:0 0 100%; min-width:0; padding:0 6px;">
-              <div class="content has-text-justified">
-                <p>
-                  <strong> Reasoning and multimodality </strong> We visualize rollouts on the D3IL avoiding task as the
-                  maximum number of latent steps is truncated. The policy becomes effectively deterministic as the
-                  latent
-                  length decreases to zero, yet it remains <em>mode-seeking</em> rather than mode-averaging.
-                </p>
-              </div>
-              <div class="has-text-centered">
-                <img src="./static/images/ablation_multimodality.png" loading="lazy"
-                  style="width:min(100%, 640px); border-radius:8px;" alt="Mode-seeking under truncated latent steps">
-              </div>
-            </div>
+      <!-- What type of reasoning does LMP show? -->
+      <h3 class="title is-5 mt-6 has-text-left">What type of reasoning does LMP show?</h3>
+      <div class="columns is-centered">
+        <div class="column">
+          <div class="content has-text-justified">
+            <p>
+              In LMP, every latent trace decodes a complete expert action, so additional latent steps let the policy
+              express more behavioral modes instead of refining a partial decision. Truncating latent steps at
+              <em>test time</em> drops modes (a) and lowers success only where recovery matters, such as zero-shot
+              DROID tasks (b), while shrinking the latent space at <em>training time</em> causes mode averaging (c).
+            </p>
           </div>
         </div>
-        <button id="ma-next" aria-label="Next"
-          style="flex:none; background:none; border:1px solid #ccc; border-radius:50%; width:36px; height:36px; cursor:pointer; font-size:1.1rem; line-height:1;">&#8594;</button>
       </div>
-      <div id="ma-dots" style="display:flex; justify-content:center; gap:8px; margin-top:14px;"></div>
-      <script>
-        (function () {
-          try {
-            var track = document.getElementById('ma-track');
-            var dots = document.getElementById('ma-dots');
-            var N = track.children.length, i = 0;
-            for (var k = 0; k < N; k++) (function (k) {
-              var d = document.createElement('div');
-              d.style.cssText = 'width:9px; height:9px; border-radius:50%; background:#ccc; cursor:pointer; transition:background .2s;';
-              d.addEventListener('click', function () {show(k);});
-              dots.appendChild(d);
-            })(k);
-            function show(k) {
-              i = ((k % N) + N) % N;
-              track.style.transform = 'translateX(' + (-i * 100) + '%)';
-              for (var j = 0; j < N; j++) dots.children[j].style.background = (j === i) ? '#6a4fb4' : '#ccc';
-            }
-            document.getElementById('ma-prev').addEventListener('click', function () {show(i - 1);});
-            document.getElementById('ma-next').addEventListener('click', function () {show(i + 1);});
-            show(0);
-          } catch (e) {console.error('ma-carousel:', e);}
-        })();
-      </script>
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <img src="./static/images/ablation_latent.png" loading="lazy" style="width:100%; border-radius:8px;"
+            alt="(a) D3IL avoiding rollouts under test-time truncation, (b) success rate vs test-time latent steps, (c) success rate vs training-time latent size">
+        </div>
+      </div>
 
+      <!-- Where does LMP spend its latent steps? -->
+      <h3 class="title is-5 mt-6 has-text-left">Where does LMP spend its latent steps?</h3>
+      <div class="columns is-centered">
+        <div class="column">
+          <div class="content has-text-justified">
+            <p>
+              The decoder variance schedule stores imprecision-tolerant modes in shorter traces, so the model uses
+              fewer latent steps during gripper movements, whose timing varies across demonstrations and whose
+              open&ndash;close action needs little precision. This mirrors the value of computation view of reasoning,
+              where more compute is spent only when the better fit to the expert distribution justifies the cost set
+              by the variance schedule.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h4 class="title is-6 mt-5 has-text-left">DROID Tasks</h4>
+      <div class="content has-text-centered">
+        <div class="seg-toggle">
+          <span class="seg-thumb"></span>
+          <button class="seg-btn is-active" onclick="rtTask('droid-rt', 0, this)">Block-Bowl</button>
+          <button class="seg-btn" onclick="rtTask('droid-rt', 1, this)">Marker-Mug</button>
+          <button class="seg-btn" onclick="rtTask('droid-rt', 2, this)">Peg-Hole</button>
+          <button class="seg-btn" onclick="rtTask('droid-rt', 3, this)">Clean-Table</button>
+        </div>
+      </div>
+      <div id="droid-rt">
+        <div class="rt-carousel" data-base="./static/videos/droid_reasoning_videos" data-eps="5" data-task="block-bowl">
+        </div>
+        <div class="rt-carousel" data-base="./static/videos/droid_reasoning_videos" data-eps="5" data-task="marker-mug"
+          style="display:none"></div>
+        <div class="rt-carousel" data-base="./static/videos/droid_reasoning_videos" data-eps="5" data-task="peg-hole"
+          style="display:none"></div>
+        <div class="rt-carousel" data-base="./static/videos/droid_reasoning_videos" data-eps="5" data-task="clean-table"
+          style="display:none"></div>
+      </div>
+
+      <h4 class="title is-6 mt-5 has-text-left">Simulation Tasks</h4>
+      <div class="content has-text-centered">
+        <div class="seg-toggle">
+          <span class="seg-thumb"></span>
+          <button class="seg-btn is-active" onclick="rtTask('sim-rt', 0, this)">Stacking</button>
+          <button class="seg-btn" onclick="rtTask('sim-rt', 1, this)">Square</button>
+          <button class="seg-btn" onclick="rtTask('sim-rt', 2, this)">Tool Hang</button>
+          <button class="seg-btn" onclick="rtTask('sim-rt', 3, this)">Transport</button>
+        </div>
+      </div>
+      <div id="sim-rt">
+        <div class="rt-carousel" data-base="./static/videos/sim_reasoning_videos" data-eps="5"
+          data-task="d3il_stacking"></div>
+        <div class="rt-carousel" data-base="./static/videos/sim_reasoning_videos" data-eps="5"
+          data-task="robomimic_square" style="display:none"></div>
+        <div class="rt-carousel" data-base="./static/videos/sim_reasoning_videos" data-eps="5"
+          data-task="robomimic_tool_hang" style="display:none"></div>
+        <div class="rt-carousel" data-base="./static/videos/sim_reasoning_videos" data-eps="5"
+          data-task="robomimic_transport" style="display:none"></div>
+      </div>
+
+      <!-- Qualitative Analysis: sliding-block reasoning probe -->
+      <h4 class="title is-6 mt-5 has-text-left">Probing Task</h4>
+      <div class="columns is-centered">
+        <div class="column">
+          <div class="content has-text-justified">
+            <p>
+              We manually slide a block through the open gripper while querying the policy for the number of latent
+              steps at each state. The number of latent steps shifts with the block's position relative to the gripper.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="rt-carousel" data-base="./static/videos/sim_analysis_videos" data-eps="5" data-task="."></div>
+
+      <h4 class="title is-6 mt-5 has-text-left">Latent Steps vs. Action Variance</h4>
+      <div class="columns is-centered">
+        <div class="column">
+          <div class="content has-text-justified">
+            <p>
+              More broadly, the number of latent steps of a LIBERO-90 policy is negatively correlated with the
+              variance of nearest-neighbor dataset actions. Much of this variance comes from gripper actions timed
+              differently across demonstrations.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="has-text-centered">
+        <img src="./static/images/analysis_knn.png" loading="lazy" style="width:min(80%, 480px); border-radius:8px;"
+          alt="Latent steps vs nearest-neighbor action variance">
+      </div>
 
     </div>
   </section>
@@ -1334,10 +1290,10 @@
         var io = new IntersectionObserver(function (es) {
           es.forEach(function (e) {
             if (e.isIntersecting && e.target.contentWindow)
-              e.target.contentWindow.postMessage({type: 'lmp-play'}, '*');
+              e.target.contentWindow.postMessage({ type: 'lmp-play' }, '*');
           });
-        }, {threshold: 0.35});
-        frames.forEach(function (f) {io.observe(f);});
+        }, { threshold: 0.35 });
+        frames.forEach(function (f) { io.observe(f); });
       }
       window.addEventListener('message', function (e) {
         if (e.data && e.data.type === 'lmp-libero-height') {

@@ -355,8 +355,10 @@ function groupedBarPlot(rootId, tableSel, METHODS, GROUPS) {
   }
   var groupsRow = document.createElement('div');
   groupsRow.style.cssText = 'position:absolute; inset:0; display:flex; justify-content:space-around; align-items:flex-end; padding:0 14px;';
+  // Labels share the bars' horizontal box (same parent width + padding) and each label is as
+  // wide as its bar group, so space-around puts every label center under its group center.
   var labelsRow = document.createElement('div');
-  labelsRow.style.cssText = 'display:flex; justify-content:space-around; padding:6px 14px 0 0; margin-left:34px;';
+  labelsRow.style.cssText = 'display:flex; justify-content:space-around; padding:6px 14px 0;';
 
   GROUPS.forEach(function (grp) {
     var g = document.createElement('div');
@@ -372,13 +374,14 @@ function groupedBarPlot(rootId, tableSel, METHODS, GROUPS) {
       hoverables.push({ el: cell, m: m });
     });
     groupsRow.appendChild(g);
-    labelsRow.insertAdjacentHTML('beforeend', '<div style="font-size:15px; color:#555;">' + grp.name + '</div>');
+    var groupW = grp.vals.length * 34 + (grp.vals.length - 1) * 7;   // bar width 34, gap 7
+    labelsRow.insertAdjacentHTML('beforeend', '<div style="width:' + groupW + 'px; text-align:center; white-space:nowrap; font-size:15px; color:#555;">' + grp.name + '</div>');
   });
   area.appendChild(groupsRow);
   areaWrap.appendChild(area);
+  areaWrap.appendChild(labelsRow);
   row.appendChild(yTitle); row.appendChild(areaWrap);
   root.appendChild(row);
-  root.appendChild(labelsRow);
 
   var leg = document.createElement('div');
   leg.style.cssText = 'display:flex; justify-content:center; gap:22px; margin-top:14px; flex-wrap:wrap;';
